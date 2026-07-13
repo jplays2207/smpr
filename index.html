@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMPR — The Collective</title>
+<meta name="description" content="SMPR is a selective competitive gaming collective. One hundred players. By merit only.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080807;
+  --bg-2:#0d0d0c;
+  --surface:#131312;
+  --surface-2:#191917;
+  --line:rgba(255,255,255,0.09);
+  --line-strong:rgba(255,255,255,0.16);
+  --text:#f4f3ee;
+  --muted:#8f8f87;
+  --muted-2:#5f5f58;
+  --amber:#f6a01c;
+  --amber-2:#ffb84a;
+  --plate:#e7e4dd;
+  --maxw:1320px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Space Grotesk",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;transition:color .25s ease}
+a:hover{color:var(--amber)}
+img{display:block;max-width:100%}
+::selection{background:var(--amber);color:#000}
+
+/* ---- Type helpers ---- */
+.display{font-family:"Anton",sans-serif;font-weight:400;text-transform:uppercase;line-height:.92;letter-spacing:.005em}
+.mono{font-family:"Space Mono",monospace}
+.kicker{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
+.amber{color:var(--amber)}
+
+/* ---- Layout ---- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;width:100%}
+section{position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--amber)}
+
+/* ---- Grain / texture overlay ---- */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC45JyBudW1PY3RhdmVzPScyJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsdGVyPSd1cmwoI24pJy8+PC9zdmc+");
+}
+
+/* ---- Nav ---- */
+header{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .3s ease,border-color .3s ease,backdrop-filter .3s}
+header.scrolled{background:rgba(8,8,7,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{display:flex;align-items:center;gap:12px;font-family:"Anton",sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:20px}
+.brand .mark{width:34px;height:34px;border:1px solid var(--line-strong);border-radius:7px;display:grid;place-items:center;background:#000;overflow:hidden}
+.brand .mark img{width:24px;height:24px;object-fit:cover}
+.nav-links{display:flex;align-items:center;gap:34px}
+.nav-links a{font-size:13px;letter-spacing:.04em;color:var(--muted);font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.btn{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--line-strong);color:var(--text);background:transparent;
+  padding:12px 20px;cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:9px;white-space:nowrap
+}
+.btn:hover{border-color:var(--amber);color:var(--amber)}
+.btn-solid{background:var(--amber);border-color:var(--amber);color:#0a0a0a;font-weight:700}
+.btn-solid:hover{background:var(--amber-2);border-color:var(--amber-2);color:#0a0a0a}
+.btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.menu-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;flex-direction:column;gap:5px;padding:8px}
+.menu-toggle span{width:24px;height:2px;background:currentColor;transition:.3s}
+
+/* ---- Hero ---- */
+.hero{min-height:100svh;display:flex;align-items:center;padding-top:74px;overflow:hidden}
+.hero-glow{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(600px 600px at var(--mx,70%) var(--my,20%),rgba(246,160,28,.14),transparent 60%);
+  transition:background .2s ease}
+.hero-bg-word{position:absolute;right:-4vw;bottom:-6vh;font-family:"Anton",sans-serif;font-size:min(30vw,440px);color:rgba(255,255,255,.02);letter-spacing:-.02em;z-index:0;pointer-events:none;line-height:.8}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;position:relative;z-index:2;width:100%}
+.hero-left h1{font-size:clamp(52px,8.2vw,124px);margin:22px 0 26px}
+.hero-left h1 .l2{color:var(--amber)}
+.hero-lead{font-size:clamp(16px,1.5vw,19px);color:var(--muted);max-width:44ch;line-height:1.65}
+.hero-lead b{color:var(--text);font-weight:600}
+.hero-cta{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap}
+.hero-cta .btn{padding:16px 26px;font-size:12px}
+.hero-meta{display:flex;gap:34px;margin-top:42px;flex-wrap:wrap}
+.hero-meta .m{border-left:1px solid var(--line);padding-left:16px}
+.hero-meta .m .n{font-family:"Anton",sans-serif;font-size:30px;line-height:1}
+.hero-meta .m .t{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+/* Portrait plate */
+.plate{position:relative;border:1px solid var(--line-strong);background:var(--plate);aspect-ratio:1/1;overflow:hidden}
+.plate img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.plate .corner{position:absolute;width:14px;height:14px;border:2px solid var(--amber)}
+.plate .corner.tl{top:10px;left:10px;border-right:0;border-bottom:0}
+.plate .corner.tr{top:10px;right:10px;border-left:0;border-bottom:0}
+.plate .corner.bl{bottom:10px;left:10px;border-right:0;border-top:0}
+.plate .corner.br{bottom:10px;right:10px;border-left:0;border-top:0}
+.plate-bar{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:44px 16px 14px;display:flex;justify-content:space-between;align-items:flex-end;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;color:#fff}
+.plate-bar .st{color:var(--amber)}
+.plate-tag{position:absolute;top:12px;right:12px;background:#000;color:#fff;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;padding:6px 10px}
+
+/* ---- Marquee ---- */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2);overflow:hidden;padding:20px 0}
+.marquee-track{display:flex;gap:40px;white-space:nowrap;width:max-content;animation:scroll-x 38s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-track span{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:26px;letter-spacing:.03em;color:var(--muted)}
+.marquee-track .sep{color:var(--amber);font-family:"Space Grotesk";font-size:20px;display:flex;align-items:center}
+@keyframes scroll-x{to{transform:translateX(-50%)}}
+
+/* ---- Section shell ---- */
+.pad{padding:120px 0}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:56px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(34px,5vw,66px)}
+.sec-head p{color:var(--muted);max-width:38ch;font-size:15px}
+
+/* ---- The 100 ---- */
+.hundred{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hundred-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.big-count{font-family:"Anton",sans-serif;font-size:clamp(80px,15vw,220px);line-height:.82;letter-spacing:-.01em}
+.big-count .of{color:var(--muted-2);font-size:.42em;display:block;letter-spacing:.02em}
+.bar{height:6px;background:var(--surface-2);border:1px solid var(--line);margin:28px 0 14px;overflow:hidden}
+.bar .fill{height:100%;background:var(--amber);width:0;transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.bar-labels{display:flex;justify-content:space-between;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.dot-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:9px}
+.dot-grid .cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:2px;transition:background .4s ease,border-color .4s ease,transform .4s ease}
+.dot-grid .cell.on{background:var(--amber);border-color:var(--amber)}
+.hundred-copy p{color:var(--muted);font-size:16px;line-height:1.7;margin-bottom:18px;max-width:46ch}
+.hundred-copy p b{color:var(--text)}
+
+/* ---- Merch ---- */
+.drops{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.drop{border:1px solid var(--line);background:var(--surface);transition:border-color .3s ease,transform .3s ease}
+.drop:hover{border-color:var(--line-strong);transform:translateY(-4px)}
+.drop .ph{aspect-ratio:4/5;position:relative;overflow:hidden;
+  background:
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.03) 0 2px,transparent 2px 14px),
+    var(--surface-2);
+  display:grid;place-items:center}
+.drop .ph .glyph{width:64px;height:64px;opacity:.4}
+.drop .ph .cap{position:absolute;bottom:12px;left:12px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted-2);text-transform:uppercase}
+.drop .tag{position:absolute;top:12px;left:12px;background:var(--amber);color:#000;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;padding:5px 9px;font-weight:700}
+.drop .info{padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.drop .info .name{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:19px;letter-spacing:.02em}
+.drop .info .sub{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.06em}
+.drop .info .price{font-family:"Space Mono",monospace;font-size:12px;color:var(--amber);white-space:nowrap}
+.merch-foot{margin-top:36px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+.merch-foot .t{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+
+/* ---- Partners ---- */
+.partners{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.partner-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.partner{border-right:1px solid var(--line);border-bottom:1px solid var(--line);aspect-ratio:16/7;display:grid;place-items:center;transition:background .3s}
+.partner:hover{background:var(--surface)}
+.partner .pn{font-family:"Space Grotesk";font-weight:700;font-size:16px;letter-spacing:.04em;color:var(--muted);text-align:center;transition:color .3s;padding:0 12px}
+.partner:hover .pn{color:var(--text)}
+.partner .pn small{display:block;font-family:"Space Mono",monospace;font-weight:400;font-size:9px;letter-spacing:.24em;color:var(--muted-2);margin-top:6px;text-transform:uppercase}
+
+/* ---- Apply ---- */
+.apply-shell{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
+.apply-intro h2{font-size:clamp(38px,5.5vw,72px);margin:20px 0 24px}
+.apply-intro p{color:var(--muted);font-size:16px;line-height:1.7;max-width:40ch;margin-bottom:26px}
+.apply-intro ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.apply-intro li{display:flex;gap:12px;align-items:center;font-family:"Space Mono",monospace;font-size:13px;color:var(--muted);letter-spacing:.04em}
+.apply-intro li::before{content:"";width:7px;height:7px;background:var(--amber);flex:none}
+.form-card{border:1px solid var(--line-strong);background:var(--surface);padding:34px}
+.steps-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.steps-head .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.step-dots{display:flex;gap:8px}
+.step-dots i{width:26px;height:3px;background:var(--surface-2);border:1px solid var(--line);transition:background .3s}
+.step-dots i.active{background:var(--amber);border-color:var(--amber)}
+.step{display:none;animation:fade .4s ease}
+.step.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.field{margin-bottom:18px}
+.field label{display:block;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
+  padding:14px 15px;font-family:"Space Grotesk";font-size:15px;transition:border-color .25s
+}
+.field textarea{resize:vertical;min-height:88px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--amber)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted-2)}
+.chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:var(--bg);padding:14px;cursor:pointer;transition:.25s;text-align:left}
+.chip:hover{border-color:var(--line-strong)}
+.chip.sel{border-color:var(--amber);background:rgba(246,160,28,.08)}
+.chip .ct{font-weight:600;font-size:14px}
+.chip .cd{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:.06em;margin-top:4px}
+.step-nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+.link-btn{background:none;border:none;color:var(--muted);font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:color .25s}
+.link-btn:hover{color:var(--text)}
+.link-btn:disabled{opacity:.3;cursor:not-allowed}
+.apply-done{text-align:center;padding:20px 0;display:none}
+.apply-done.show{display:block;animation:fade .5s ease}
+.apply-done .ico{width:56px;height:56px;border:2px solid var(--amber);border-radius:50%;display:grid;place-items:center;margin:0 auto 22px;color:var(--amber);font-size:26px}
+.apply-done h3{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:30px;margin-bottom:12px}
+.apply-done p{color:var(--muted);font-size:14px;max-width:34ch;margin:0 auto 18px}
+.apply-done .ref{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.14em;color:var(--amber);border:1px dashed var(--line-strong);display:inline-block;padding:10px 16px}
+
+/* ---- Footer ---- */
+footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;overflow:hidden}
+.foot-word{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-family:"Anton",sans-serif;font-size:min(26vw,340px);color:rgba(255,255,255,.022);pointer-events:none;letter-spacing:.02em}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;position:relative;z-index:2}
+.foot-cta h3{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:clamp(28px,4vw,52px);line-height:.95;margin-bottom:22px}
+.socials{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.socials a{border:1px solid var(--line);padding:11px 16px;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;color:var(--muted);transition:.25s}
+.socials a:hover{border-color:var(--amber);color:var(--amber)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-top:70px;padding-top:26px;border-top:1px solid var(--line);position:relative;z-index:2}
+.foot-bottom .c{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--muted-2)}
+
+/* ---- Modal / Portal ---- */
+.modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.open{display:flex}
+.modal-bg{position:absolute;inset:0;background:rgba(4,4,4,.82);backdrop-filter:blur(8px);animation:fade .3s ease}
+.modal-box{position:relative;z-index:2;width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line-strong);animation:pop .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+.modal-x{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;z-index:5;line-height:1;transition:color .2s}
+.modal-x:hover{color:var(--text)}
+.portal-login{padding:40px 34px}
+.portal-login .lock{width:44px;height:44px;border:1px solid var(--line-strong);border-radius:9px;display:grid;place-items:center;margin-bottom:22px;background:#000}
+.portal-login .lock img{width:30px;height:30px}
+.portal-login h3{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:28px;margin-bottom:8px}
+.portal-login p{color:var(--muted);font-size:13px;margin-bottom:24px}
+.portal-login .hint{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted-2);margin-top:16px;letter-spacing:.06em}
+.portal-login .hint code{color:var(--amber)}
+.err{color:#ff6b5e;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;margin-top:10px;min-height:14px}
+
+/* Member card */
+.member-card{display:none}
+.member-card.show{display:block;animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+.mc-top{background:#000;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.mc-top .brand{font-size:16px;gap:9px}
+.mc-top .brand .mark{width:28px;height:28px}
+.mc-top .brand .mark img{width:20px;height:20px}
+.mc-top .status{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;color:var(--amber);display:flex;align-items:center;gap:7px}
+.mc-top .status .pulse{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.mc-body{padding:26px 24px;background:linear-gradient(160deg,var(--surface-2),var(--surface))}
+.mc-no{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px}
+.mc-no b{color:var(--amber)}
+.mc-handle{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:38px;line-height:.95;word-break:break-word;margin-bottom:18px}
+.mc-rows{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.mc-rows .r .k{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);margin-bottom:5px}
+.mc-rows .r .v{font-size:14px;font-weight:600}
+.mc-barcode{height:38px;background:repeating-linear-gradient(90deg,var(--text) 0 2px,transparent 2px 4px,var(--text) 4px 5px,transparent 5px 9px);opacity:.85}
+.mc-id{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted);margin-top:10px;display:flex;justify-content:space-between}
+.mc-foot{padding:18px 24px;border-top:1px solid var(--line);background:#000}
+.mc-foot .btn{width:100%;justify-content:center}
+
+/* ---- Reveal ---- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---- Responsive ---- */
+@media(max-width:960px){
+  .nav-links{display:none}
+  .menu-toggle{display:flex}
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .hero-right{max-width:400px}
+  .hundred-grid{grid-template-columns:1fr;gap:44px}
+  .apply-shell{grid-template-columns:1fr;gap:44px}
+  .drops{grid-template-columns:1fr 1fr}
+  .partner-grid{grid-template-columns:repeat(2,1fr)}
+  .mobile-nav.open{display:flex}
+}
+@media(max-width:640px){
+  .wrap{padding:0 20px}
+  .pad{padding:84px 0}
+  .drops{grid-template-columns:1fr}
+  .hero-meta{gap:22px}
+  .form-card{padding:24px}
+  .chip-grid{grid-template-columns:1fr}
+  .mc-handle{font-size:30px}
+}
+
+/* Mobile nav drawer */
+.mobile-nav{display:none;position:fixed;inset:0;z-index:180;background:var(--bg);flex-direction:column;justify-content:center;gap:8px;padding:40px}
+.mobile-nav a{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:34px;color:var(--muted)}
+.mobile-nav a:hover{color:var(--text)}
+.mobile-nav .btn{margin-top:22px;align-self:flex-start;font-size:14px;padding:16px 26px}
+.mobile-nav .mx{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--text);font-size:30px;cursor:pointer}
+</style>
+</head>
+<body>
+
+
+<!-- ============ NAV ============ -->
+<header id="header">
+  <div class="wrap nav">
+    <a href="#top" class="brand"><span class="mark"><img src="assets/logo.png" alt="SMPR"></span>SMPR</a>
+    <nav class="nav-links">
+      <a href="#hundred">The 100</a>
+      <a href="#merch">Drops</a>
+      <a href="#partners">Partners</a>
+      <a href="#apply">Apply</a>
+    </nav>
+    <div style="display:flex;gap:12px;align-items:center">
+      <button class="btn btn-solid open-portal">Enter Portal <span class="dot"></span></button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mx" id="mobileClose" aria-label="Close">×</button>
+  <a href="#hundred" class="mnav-link">The 100</a>
+  <a href="#merch" class="mnav-link">Drops</a>
+  <a href="#partners" class="mnav-link">Partners</a>
+  <a href="#apply" class="mnav-link">Apply</a>
+  <button class="btn btn-solid open-portal">Enter Portal <span class="dot"></span></button>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-glow" id="heroGlow"></div>
+  <div class="hero-bg-word">SMPR</div>
+  <div class="wrap hero-grid">
+    <div class="hero-left">
+      <span class="eyebrow reveal">A Competitive Gaming Collective</span>
+      <h1 class="display reveal">A New Order<br><span class="l2">Of Players</span></h1>
+      <p class="hero-lead reveal">SMPR is a selective collective of the world's most exceptional mini-game players. <b>Grinders. Speed-runners. PvP demons. Puzzle lords.</b> By merit and invitation only.</p>
+      <div class="hero-cta reveal">
+        <button class="btn btn-solid open-portal">Enter Portal <span class="dot"></span></button>
+        <a href="#apply" class="btn">Apply for Membership</a>
+      </div>
+      <div class="hero-meta reveal">
+        <div class="m"><div class="n">100</div><div class="t">Seats Only</div></div>
+        <div class="m"><div class="n">∞</div><div class="t">Worldwide</div></div>
+        <div class="m"><div class="n">01</div><div class="t">Collective</div></div>
+      </div>
+    </div>
+    <div class="hero-right reveal">
+      <div class="plate">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <span class="plate-tag">MASKED</span>
+        <img src="assets/hero.png" alt="SMPR member">
+        <div class="plate-bar">
+          <span>MEMBER&nbsp;//&nbsp;IDENTITY&nbsp;WITHHELD</span>
+          <span class="st">● LIVE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marquee"></div>
+</div>
+
+<!-- ============ THE 100 ============ -->
+<section class="hundred pad" id="hundred">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <span class="eyebrow">Selection // The 100</span>
+        <h2 class="display" style="margin-top:18px">The Collective<br>Is Capped</h2>
+      </div>
+      <p>One hundred approved players. Not one more. Every seat is earned, reviewed and held. When it's full, it's closed.</p>
+    </div>
+    <div class="hundred-grid">
+      <div class="hundred-copy reveal">
+        <div class="big-count"><span class="of">Member</span><span id="count">00</span> <span style="color:var(--muted-2);font-size:.42em">/ 100</span></div>
+        <div class="bar"><div class="fill" id="barFill"></div></div>
+        <div class="bar-labels"><span id="claimedLbl">— seats claimed</span><span id="openLbl">— open</span></div>
+        <p style="margin-top:30px"><b>Selection is ongoing.</b> Seats open as players earn them and close the moment the standard is met. Approval is by the collective, not by application volume.</p>
+        <p>You are not buying in. You are being let in.</p>
+      </div>
+      <div class="dot-grid reveal" id="dotGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MERCH ============ -->
+<section class="pad" id="merch">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <span class="eyebrow">Wardrobe // Drops</span>
+        <h2 class="display" style="margin-top:18px">Worn By<br>The Collective</h2>
+      </div>
+      <p>Limited, member-first apparel. Premium blanks, masked identity, no logos shouting. Drops are seasonal and rarely restocked.</p>
+    </div>
+    <div class="drops">
+      <div class="drop reveal">
+        <div class="ph">
+          <span class="tag">DROP 01</span>
+          <img class="glyph" src="assets/logo.png" alt="">
+          <span class="cap">[ product shot — masked hoodie ]</span>
+        </div>
+        <div class="info">
+          <div><div class="name">Blackout Hoodie</div><div class="sub">Heavyweight / Masked back print</div></div>
+          <div class="price">SOON</div>
+        </div>
+      </div>
+      <div class="drop reveal">
+        <div class="ph">
+          <span class="tag">DROP 02</span>
+          <img class="glyph" src="assets/logo.png" alt="">
+          <span class="cap">[ product shot — runic tee ]</span>
+        </div>
+        <div class="info">
+          <div><div class="name">Runic Tee</div><div class="sub">Boxy fit / SMPR wordmark</div></div>
+          <div class="price">SOON</div>
+        </div>
+      </div>
+      <div class="drop reveal">
+        <div class="ph">
+          <span class="tag">DROP 03</span>
+          <img class="glyph" src="assets/logo.png" alt="">
+          <span class="cap">[ product shot — collective cap ]</span>
+        </div>
+        <div class="info">
+          <div><div class="name">Collective Cap</div><div class="sub">Structured / Amber shield</div></div>
+          <div class="price">SOON</div>
+        </div>
+      </div>
+    </div>
+    <div class="merch-foot reveal">
+      <span class="t">// Store opens to members first. Public access follows.</span>
+      <button class="btn open-portal">Members Shop <span class="dot"></span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PARTNERS ============ -->
+<section class="partners pad" id="partners">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <span class="eyebrow">Alliances // Partners</span>
+        <h2 class="display" style="margin-top:18px">Backed By<br>The Right Rooms</h2>
+      </div>
+      <p>SMPR works with brands, platforms and organisations that share the standard. Selective on this side too.</p>
+    </div>
+    <div class="partner-grid reveal">
+      <div class="partner"><div class="pn">Topps<small>Total Football</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
+      <div class="partner"><div class="pn amber" style="color:var(--amber)">Become a Partner<small style="color:var(--muted)">Enquire →</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APPLY ============ -->
+<section class="pad" id="apply">
+  <div class="wrap apply-shell">
+    <div class="apply-intro reveal">
+      <span class="eyebrow">Entry // Application</span>
+      <h2 class="display">Earn<br>Your Mask</h2>
+      <p>Applications are read by the collective. There is no fee, no fast-track, no guarantee. Show us why the standard is you.</p>
+      <ul>
+        <li>Any game. Any region. Any archetype.</li>
+        <li>Reviewed on merit, culture and craft.</li>
+        <li>Approved members receive portal access.</li>
+      </ul>
+    </div>
+
+    <div class="form-card reveal">
+      <form id="applyForm">
+        <div class="steps-head">
+          <span class="lbl">Application</span>
+          <div class="step-dots"><i class="active"></i><i></i><i></i></div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="step active" data-step="1">
+          <div class="field">
+            <label>Choose your archetype</label>
+            <div class="chip-grid" id="archetypes">
+              <div class="chip" data-val="Grinder"><div class="ct">Grinder</div><div class="cd">Volume · consistency</div></div>
+              <div class="chip" data-val="Speed-runner"><div class="ct">Speed-runner</div><div class="cd">Optimised · frame-perfect</div></div>
+              <div class="chip" data-val="PvP Demon"><div class="ct">PvP Demon</div><div class="cd">1v1 · mechanical</div></div>
+              <div class="chip" data-val="Puzzle Lord"><div class="ct">Puzzle Lord</div><div class="cd">Logic · lateral</div></div>
+              <div class="chip" data-val="Mobile Competitor"><div class="ct">Mobile Competitor</div><div class="cd">Ranked · on the go</div></div>
+              <div class="chip" data-val="Casual-game Specialist"><div class="ct">Casual Specialist</div><div class="cd">Mini-games · party</div></div>
+              <div class="chip" data-val="Content-first Player"><div class="ct">Content-first</div><div class="cd">Camera · craft</div></div>
+              <div class="chip" data-val="Community Personality"><div class="ct">Community</div><div class="cd">Culture · voice</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" data-step="2">
+          <div class="field">
+            <label>In-game name / handle</label>
+            <input type="text" id="ign" placeholder="e.g. NightShade">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="you@domain.com">
+          </div>
+          <div class="field">
+            <label>Region</label>
+            <select id="region">
+              <option value="">Select region…</option>
+              <option>North America</option>
+              <option>South America</option>
+              <option>Europe</option>
+              <option>UK &amp; Ireland</option>
+              <option>MENA</option>
+              <option>Africa</option>
+              <option>Asia-Pacific</option>
+              <option>Oceania</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" data-step="3">
+          <div class="field">
+            <label>Primary platform / proof</label>
+            <input type="text" id="link" placeholder="Twitch / YouTube / Tracker / X link">
+          </div>
+          <div class="field">
+            <label>Why SMPR? (short)</label>
+            <textarea id="why" placeholder="Tell the collective what makes your game worth watching."></textarea>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="link-btn" id="prevBtn" disabled="">← Back</button>
+          <button type="button" class="btn btn-solid" id="nextBtn">Continue <span class="dot"></span></button>
+        </div>
+      </form>
+
+      <div class="apply-done" id="applyDone">
+        <div class="ico">✓</div>
+        <h3>Application Received</h3>
+        <p>The collective reviews every submission personally. If your standard fits, you'll hear from us.</p>
+        <div class="ref" id="refNo">SMPR-APP-000000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-word">SMPR</div>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-cta">
+        <span class="eyebrow" style="margin-bottom:18px;display:inline-flex">Join // The Movement</span>
+        <h3 class="display">Masks On.<br>Standards Up.</h3>
+        <button class="btn btn-solid open-portal">Enter Portal <span class="dot"></span></button>
+      </div>
+      <div>
+        <div class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:16px">Connect</div>
+        <div class="socials">
+          <a href="#" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="#" target="_blank" rel="noopener">Instagram</a>
+          <a href="#" target="_blank" rel="noopener">TikTok</a>
+          <a href="#" target="_blank" rel="noopener">YouTube</a>
+          <a href="#" target="_blank" rel="noopener">Discord</a>
+          <a href="#" target="_blank" rel="noopener">Twitch</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="brand" style="font-size:16px"><span class="mark"><img src="assets/logo.png" alt="SMPR"></span>SMPR</div>
+      <div class="c">© <span id="year"></span> SMPR Collective — A competitive gaming collective. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ PORTAL MODAL ============ -->
+<div class="modal" id="portalModal" aria-hidden="true">
+  <div class="modal-bg" data-close=""></div>
+  <div class="modal-box">
+    <button class="modal-x" data-close="" aria-label="Close">×</button>
+
+    <div class="portal-login" id="portalLogin">
+      <div class="lock"><img src="assets/logo.png" alt=""></div>
+      <h3>Member Portal</h3>
+      <p>Enter your access code or member email to open your identity.</p>
+      <form id="portalForm">
+        <div class="field">
+          <label>Access code / email</label>
+          <input type="text" id="accessInput" placeholder="SMPR-XXXX or you@domain.com" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-solid" style="width:100%;justify-content:center">Authenticate <span class="dot"></span></button>
+        <div class="err" id="portalErr"></div>
+        <div class="hint">Demo — try code <code>SMPR-2024</code> or any email.</div>
+      </form>
+    </div>
+
+    <div class="member-card" id="memberCard">
+      <div class="mc-top">
+        <span class="brand"><span class="mark"><img src="assets/logo.png" alt=""></span>SMPR</span>
+        <span class="status"><span class="pulse"></span>APPROVED</span>
+      </div>
+      <div class="mc-body">
+        <div class="mc-no">MEMBER No. <b id="mcNo">063</b> / 100</div>
+        <div class="mc-handle" id="mcHandle">NIGHTSHADE</div>
+        <div class="mc-rows">
+          <div class="r"><div class="k">Archetype</div><div class="v" id="mcType">PvP Demon</div></div>
+          <div class="r"><div class="k">Region</div><div class="v" id="mcRegion">Worldwide</div></div>
+          <div class="r"><div class="k">Clearance</div><div class="v amber">Full Portal</div></div>
+          <div class="r"><div class="k">Issued</div><div class="v" id="mcIssued">—</div></div>
+        </div>
+        <div class="mc-barcode"></div>
+        <div class="mc-id"><span id="mcId">ID · —</span><span>SMPR // COLLECTIVE</span></div>
+      </div>
+      <div class="mc-foot">
+        <button class="btn btn-solid" id="enterWorld">Enter The World <span class="dot"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- Year ---- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---- Nav scroll state ---- */
+  var header = document.getElementById('header');
+  var onScroll = function(){ header.classList.toggle('scrolled', window.scrollY > 20); };
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  /* ---- Mobile nav ---- */
+  var mnav = document.getElementById('mobileNav');
+  document.getElementById('menuToggle').addEventListener('click', function(){ mnav.classList.add('open'); });
+  document.getElementById('mobileClose').addEventListener('click', function(){ mnav.classList.remove('open'); });
+  document.querySelectorAll('.mnav-link').forEach(function(a){ a.addEventListener('click', function(){ mnav.classList.remove('open'); }); });
+
+  /* ---- Hero glow follows pointer ---- */
+  var glow = document.getElementById('heroGlow');
+  var hero = document.querySelector('.hero');
+  hero.addEventListener('pointermove', function(e){
+    var r = hero.getBoundingClientRect();
+    glow.style.setProperty('--mx', ((e.clientX - r.left)/r.width*100)+'%');
+    glow.style.setProperty('--my', ((e.clientY - r.top)/r.height*100)+'%');
+  });
+
+  /* ---- Marquee ---- */
+  var words = ['Grinders','Speed-runners','PvP Demons','Puzzle Lords','Mobile Competitors','Casual Specialists','Content-first','Community'];
+  var track = document.getElementById('marquee');
+  var build = function(){
+    words.forEach(function(w){
+      var s = document.createElement('span'); s.textContent = w; track.appendChild(s);
+      var sep = document.createElement('span'); sep.className='sep'; sep.textContent='◆'; track.appendChild(sep);
+    });
+  };
+  build(); build(); // duplicate for seamless loop
+
+  /* ---- Reveal on scroll ---- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  }, {threshold:.14});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  /* ---- The 100: count-up + dot grid ---- */
+  var CLAIMED = 63;
+  var dotGrid = document.getElementById('dotGrid');
+  var cells = [];
+  for(var i=0;i<100;i++){ var c=document.createElement('div'); c.className='cell'; dotGrid.appendChild(c); cells.push(c); }
+  var counted = false;
+  var countIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting && !counted){
+        counted = true;
+        var countEl = document.getElementById('count');
+        var start = performance.now(), dur = 1500;
+        var tick = function(now){
+          var p = Math.min((now-start)/dur,1);
+          var e = 1-Math.pow(1-p,3);
+          var v = Math.round(e*CLAIMED);
+          countEl.textContent = String(v).padStart(2,'0');
+          if(p<1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        document.getElementById('barFill').style.width = CLAIMED+'%';
+        document.getElementById('claimedLbl').textContent = CLAIMED+' seats claimed';
+        document.getElementById('openLbl').textContent = (100-CLAIMED)+' open';
+        // fill dots progressively
+        var order = cells.map(function(_,idx){return idx;});
+        for(var j=0;j<CLAIMED;j++){
+          (function(idx,k){ setTimeout(function(){ cells[idx].classList.add('on'); }, 200 + k*14); })(order[j], j);
+        }
+      }
+    });
+  }, {threshold:.3});
+  countIO.observe(document.getElementById('hundred'));
+
+  /* ---- Apply: archetype select ---- */
+  var chosenType = '';
+  document.querySelectorAll('#archetypes .chip').forEach(function(ch){
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('#archetypes .chip').forEach(function(x){x.classList.remove('sel');});
+      ch.classList.add('sel'); chosenType = ch.getAttribute('data-val');
+    });
+  });
+
+  /* ---- Apply: steps ---- */
+  var curStep = 1, maxStep = 3;
+  var steps = document.querySelectorAll('#applyForm .step');
+  var dots = document.querySelectorAll('.step-dots i');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var showStep = function(n){
+    steps.forEach(function(s){ s.classList.toggle('active', +s.dataset.step===n); });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i < n); });
+    prevBtn.disabled = n===1;
+    nextBtn.textContent = n===maxStep ? 'Submit Application' : 'Continue';
+    if(n===maxStep){ nextBtn.querySelector('.dot')?.remove(); } 
+  };
+  var validate = function(n){
+    if(n===1 && !chosenType){ alert('Select an archetype to continue.'); return false; }
+    if(n===2){
+      var ign=document.getElementById('ign').value.trim();
+      var email=document.getElementById('email').value.trim();
+      var region=document.getElementById('region').value;
+      if(!ign||!email||!region){ alert('Please complete handle, email and region.'); return false; }
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Enter a valid email.'); return false; }
+    }
+    return true;
+  };
+  nextBtn.addEventListener('click', function(){
+    if(!validate(curStep)) return;
+    if(curStep < maxStep){ curStep++; showStep(curStep); }
+    else { submitApply(); }
+  });
+  prevBtn.addEventListener('click', function(){ if(curStep>1){ curStep--; showStep(curStep);} });
+
+  function submitApply(){
+    document.getElementById('applyForm').style.display='none';
+    var done = document.getElementById('applyDone');
+    var ref = 'SMPR-APP-' + String(Math.floor(100000+Math.random()*899999));
+    document.getElementById('refNo').textContent = ref;
+    done.classList.add('show');
+  }
+
+  /* ---- Portal modal ---- */
+  var modal = document.getElementById('portalModal');
+  var login = document.getElementById('portalLogin');
+  var card = document.getElementById('memberCard');
+  var openModal = function(){
+    modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+    login.style.display='block'; card.classList.remove('show');
+    document.getElementById('portalErr').textContent='';
+    document.body.style.overflow='hidden';
+    mnav.classList.remove('open');
+    setTimeout(function(){ document.getElementById('accessInput').focus(); }, 120);
+  };
+  var closeModal = function(){
+    modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  };
+  document.querySelectorAll('.open-portal').forEach(function(b){ b.addEventListener('click', openModal); });
+  modal.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', closeModal); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+  var TYPES = ['Grinder','Speed-runner','PvP Demon','Puzzle Lord','Mobile Competitor','Casual Specialist','Content-first','Community'];
+  var REGIONS = ['Worldwide','North America','Europe','Asia-Pacific','South America','MENA','Oceania'];
+  document.getElementById('portalForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var val = document.getElementById('accessInput').value.trim();
+    var err = document.getElementById('portalErr');
+    if(!val){ err.textContent='> Enter your access code or member email.'; return; }
+    // derive a handle
+    var handle = val.indexOf('@')>-1 ? val.split('@')[0] : val.replace(/^SMPR-?/i,'');
+    handle = (handle||'MEMBER').replace(/[^a-zA-Z0-9_]/g,'').toUpperCase().slice(0,14) || 'MEMBER';
+    var seed = 0; for(var i=0;i<val.length;i++){ seed = (seed*31 + val.charCodeAt(i))>>>0; }
+    var memberNo = String((seed % 63) + 1).padStart(3,'0');
+    document.getElementById('mcHandle').textContent = handle;
+    document.getElementById('mcNo').textContent = memberNo;
+    document.getElementById('mcType').textContent = TYPES[seed % TYPES.length];
+    document.getElementById('mcRegion').textContent = REGIONS[seed % REGIONS.length];
+    var d = new Date();
+    document.getElementById('mcIssued').textContent = (d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
+    document.getElementById('mcId').textContent = 'ID · '+ seed.toString(16).toUpperCase().slice(0,10).padStart(8,'0');
+    login.style.display='none'; card.classList.add('show');
+  });
+  document.getElementById('enterWorld').addEventListener('click', closeModal);
+
+})();
+</script>
+
+
+</body></html>
