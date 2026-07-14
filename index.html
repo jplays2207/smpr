@@ -138,7 +138,7 @@ header.scrolled{background:rgba(8,8,7,.72);backdrop-filter:blur(14px);border-bot
 .hundred-copy p b{color:var(--text)}
 
 /* ---- Merch ---- */
-.drops{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.drops{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .drop{border:1px solid var(--line);background:var(--surface);transition:border-color .3s ease,transform .3s ease}
 .drop:hover{border-color:var(--line-strong);transform:translateY(-4px)}
 .drop .ph{aspect-ratio:4/5;position:relative;overflow:hidden;
@@ -148,7 +148,10 @@ header.scrolled{background:rgba(8,8,7,.72);backdrop-filter:blur(14px);border-bot
   display:grid;place-items:center}
 .drop .ph .glyph{width:64px;height:64px;opacity:.4}
 .drop .ph .cap{position:absolute;bottom:12px;left:12px;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted-2);text-transform:uppercase}
-.drop .tag{position:absolute;top:12px;left:12px;background:var(--amber);color:#000;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;padding:5px 9px;font-weight:700}
+.drop .tag{position:absolute;top:12px;left:12px;background:var(--amber);color:#000;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;padding:5px 9px;font-weight:700;z-index:3}
+.drop .ph .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.drop:hover .ph .shot{transform:scale(1.06)}
+.drop .ph::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,8,7,0) 52%,rgba(8,8,7,.5))}
 .drop .info{padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .drop .info .name{font-family:"Anton",sans-serif;text-transform:uppercase;font-size:19px;letter-spacing:.02em}
 .drop .info .sub{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.06em}
@@ -395,33 +398,40 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
       <div class="drop reveal">
         <div class="ph">
           <span class="tag">DROP 01</span>
-          <img class="glyph" src="logo.png" alt="">
-          <span class="cap">[ product shot — masked hoodie ]</span>
+          <img class="shot" src="assets/merch/white-jersey.jpg" alt="SMPR white runic jersey">
         </div>
         <div class="info">
-          <div><div class="name">Blackout Hoodie</div><div class="sub">Heavyweight / Masked back print</div></div>
+          <div><div class="name">Runic Jersey — White</div><div class="sub">Sublimated / Masked shield</div></div>
           <div class="price">SOON</div>
         </div>
       </div>
       <div class="drop reveal">
         <div class="ph">
           <span class="tag">DROP 02</span>
-          <img class="glyph" src="logo.png" alt="">
-          <span class="cap">[ product shot — runic tee ]</span>
+          <img class="shot" src="assets/merch/camo-jersey.jpg" alt="SMPR camo runic jersey">
         </div>
         <div class="info">
-          <div><div class="name">Runic Tee</div><div class="sub">Boxy fit / SMPR wordmark</div></div>
+          <div><div class="name">Runic Jersey — Camo</div><div class="sub">Sublimated / Amber break-up</div></div>
           <div class="price">SOON</div>
         </div>
       </div>
       <div class="drop reveal">
         <div class="ph">
           <span class="tag">DROP 03</span>
-          <img class="glyph" src="logo.png" alt="">
-          <span class="cap">[ product shot — collective cap ]</span>
+          <img class="shot" src="assets/merch/masked-cap.jpg" alt="SMPR masked-face cap">
         </div>
         <div class="info">
-          <div><div class="name">Collective Cap</div><div class="sub">Structured / Amber shield</div></div>
+          <div><div class="name">Masked Cap</div><div class="sub">6-panel / Ninja mark</div></div>
+          <div class="price">SOON</div>
+        </div>
+      </div>
+      <div class="drop reveal">
+        <div class="ph">
+          <span class="tag">DROP 04</span>
+          <img class="shot" src="assets/merch/runic-cap.jpg" alt="SMPR runic wordmark cap">
+        </div>
+        <div class="info">
+          <div><div class="name">Runic Cap</div><div class="sub">6-panel / SMPR wordmark</div></div>
           <div class="price">SOON</div>
         </div>
       </div>
