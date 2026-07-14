@@ -586,22 +586,26 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
     <div class="portal-login" id="portalLogin">
       <div class="lock"><img src="logo.png" alt=""></div>
       <h3>Member Portal</h3>
-      <p>Enter your access code or member email to open your identity.</p>
+      <p>Enter your member number and access code to open your identity.</p>
       <form id="portalForm">
         <div class="field">
-          <label>Access code / email</label>
-          <input type="text" id="accessInput" placeholder="SMPR-XXXX or you@domain.com" autocomplete="off">
+          <label>Member number</label>
+          <input type="text" id="memberNoInput" placeholder="e.g. 063" autocomplete="off" inputmode="numeric">
         </div>
-        <button type="submit" class="btn btn-solid" style="width:100%;justify-content:center">Authenticate <span class="dot"></span></button>
+        <div class="field">
+          <label>Access code</label>
+          <input type="text" id="accessCode" placeholder="Your SMPR code" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-solid" id="portalSubmit" style="width:100%;justify-content:center">Authenticate <span class="dot"></span></button>
         <div class="err" id="portalErr"></div>
-        <div class="hint">Demo — try code <code>SMPR-2024</code> or any email.</div>
+        <div class="hint">Members are issued a number + code on approval.</div>
       </form>
     </div>
 
     <div class="member-card" id="memberCard">
       <div class="mc-top">
         <span class="brand"><span class="mark"><img src="logo.png" alt=""></span>SMPR</span>
-        <span class="status"><span class="pulse"></span>APPROVED</span>
+        <span class="status"><span class="pulse"></span><span id="mcStatus">APPROVED</span></span>
       </div>
       <div class="mc-body">
         <div class="mc-no">MEMBER No. <b id="mcNo">063</b> / 100</div>
@@ -666,38 +670,42 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
   }, {threshold:.14});
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 
-  /* ---- The 100: count-up + dot grid ---- */
-  var CLAIMED = 63;
+  /* ---- The 100: count-up + dot grid (live count from the member sheet) ---- */
+  var CLAIMED = 63; // fallback until the live count loads
   var dotGrid = document.getElementById('dotGrid');
   var cells = [];
   for(var i=0;i<100;i++){ var c=document.createElement('div'); c.className='cell'; dotGrid.appendChild(c); cells.push(c); }
   var counted = false;
+  function runCount(){
+    if(counted) return; counted = true;
+    var claimed = Math.max(0, Math.min(100, CLAIMED));
+    var countEl = document.getElementById('count');
+    var start = performance.now(), dur = 1500;
+    var tick = function(now){
+      var p = Math.min((now-start)/dur,1);
+      var e = 1-Math.pow(1-p,3);
+      var v = Math.round(e*claimed);
+      countEl.textContent = String(v).padStart(2,'0');
+      if(p<1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    document.getElementById('barFill').style.width = claimed+'%';
+    document.getElementById('claimedLbl').textContent = claimed+' seats claimed';
+    document.getElementById('openLbl').textContent = (100-claimed)+' open';
+    var order = cells.map(function(_,idx){return idx;});
+    for(var j=0;j<claimed;j++){
+      (function(idx,k){ setTimeout(function(){ cells[idx].classList.add('on'); }, 200 + k*14); })(order[j], j);
+    }
+  }
   var countIO = new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if(en.isIntersecting && !counted){
-        counted = true;
-        var countEl = document.getElementById('count');
-        var start = performance.now(), dur = 1500;
-        var tick = function(now){
-          var p = Math.min((now-start)/dur,1);
-          var e = 1-Math.pow(1-p,3);
-          var v = Math.round(e*CLAIMED);
-          countEl.textContent = String(v).padStart(2,'0');
-          if(p<1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-        document.getElementById('barFill').style.width = CLAIMED+'%';
-        document.getElementById('claimedLbl').textContent = CLAIMED+' seats claimed';
-        document.getElementById('openLbl').textContent = (100-CLAIMED)+' open';
-        // fill dots progressively
-        var order = cells.map(function(_,idx){return idx;});
-        for(var j=0;j<CLAIMED;j++){
-          (function(idx,k){ setTimeout(function(){ cells[idx].classList.add('on'); }, 200 + k*14); })(order[j], j);
-        }
-      }
-    });
+    entries.forEach(function(en){ if(en.isIntersecting) runCount(); });
   }, {threshold:.3});
-  countIO.observe(document.getElementById('hundred'));
+  // pull the real claimed count, then start watching the section
+  fetch('/api/portal?action=count')
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if(d && typeof d.claimed === 'number'){ CLAIMED = d.claimed; } })
+    .catch(function(){})
+    .then(function(){ countIO.observe(document.getElementById('hundred')); });
 
   /* ---- Apply: archetype select ---- */
   var chosenType = '';
@@ -757,7 +765,7 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
     document.getElementById('portalErr').textContent='';
     document.body.style.overflow='hidden';
     mnav.classList.remove('open');
-    setTimeout(function(){ document.getElementById('accessInput').focus(); }, 120);
+    setTimeout(function(){ document.getElementById('memberNoInput').focus(); }, 120);
   };
   var closeModal = function(){
     modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
@@ -767,26 +775,36 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
   modal.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', closeModal); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
 
-  var TYPES = ['Grinder','Speed-runner','PvP Demon','Puzzle Lord','Mobile Competitor','Casual Specialist','Content-first','Community'];
-  var REGIONS = ['Worldwide','North America','Europe','Asia-Pacific','South America','MENA','Oceania'];
+  var portalErr = document.getElementById('portalErr');
+  var portalSubmit = document.getElementById('portalSubmit');
   document.getElementById('portalForm').addEventListener('submit', function(e){
     e.preventDefault();
-    var val = document.getElementById('accessInput').value.trim();
-    var err = document.getElementById('portalErr');
-    if(!val){ err.textContent='> Enter your access code or member email.'; return; }
-    // derive a handle
-    var handle = val.indexOf('@')>-1 ? val.split('@')[0] : val.replace(/^SMPR-?/i,'');
-    handle = (handle||'MEMBER').replace(/[^a-zA-Z0-9_]/g,'').toUpperCase().slice(0,14) || 'MEMBER';
-    var seed = 0; for(var i=0;i<val.length;i++){ seed = (seed*31 + val.charCodeAt(i))>>>0; }
-    var memberNo = String((seed % 63) + 1).padStart(3,'0');
-    document.getElementById('mcHandle').textContent = handle;
-    document.getElementById('mcNo').textContent = memberNo;
-    document.getElementById('mcType').textContent = TYPES[seed % TYPES.length];
-    document.getElementById('mcRegion').textContent = REGIONS[seed % REGIONS.length];
-    var d = new Date();
-    document.getElementById('mcIssued').textContent = (d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
-    document.getElementById('mcId').textContent = 'ID · '+ seed.toString(16).toUpperCase().slice(0,10).padStart(8,'0');
-    login.style.display='none'; card.classList.add('show');
+    var no = document.getElementById('memberNoInput').value.trim();
+    var code = document.getElementById('accessCode').value.trim();
+    portalErr.textContent='';
+    if(!no || !code){ portalErr.textContent='> Enter your member number and access code.'; return; }
+    portalSubmit.disabled = true;
+    var origBtn = portalSubmit.innerHTML;
+    portalSubmit.textContent = 'Authenticating…';
+    fetch('/api/portal?action=validate&no='+encodeURIComponent(no)+'&code='+encodeURIComponent(code))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok){ portalErr.textContent='> Access denied. Check your number and code.'; return; }
+        var handle = String(d.handle||'MEMBER').toUpperCase();
+        var mno = String(d.memberNo||no).replace(/[^0-9]/g,'').padStart(3,'0');
+        document.getElementById('mcHandle').textContent = handle;
+        document.getElementById('mcNo').textContent = mno;
+        document.getElementById('mcType').textContent = d.archetype || '—';
+        document.getElementById('mcRegion').textContent = d.region || 'Worldwide';
+        var st = document.getElementById('mcStatus'); if(st){ st.textContent = String(d.status||'APPROVED').toUpperCase(); }
+        document.getElementById('mcIssued').textContent = d.issued || '—';
+        var s = handle + mno, seed = 0;
+        for(var i=0;i<s.length;i++){ seed = (seed*31 + s.charCodeAt(i))>>>0; }
+        document.getElementById('mcId').textContent = 'ID · '+ seed.toString(16).toUpperCase().slice(0,10).padStart(8,'0');
+        login.style.display='none'; card.classList.add('show');
+      })
+      .catch(function(){ portalErr.textContent='> Connection error. Please try again.'; })
+      .then(function(){ portalSubmit.disabled = false; portalSubmit.innerHTML = origBtn; });
   });
   document.getElementById('enterWorld').addEventListener('click', closeModal);
 
