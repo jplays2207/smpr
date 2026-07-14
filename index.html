@@ -161,10 +161,10 @@ header.scrolled{background:rgba(8,8,7,.72);backdrop-filter:blur(14px);border-bot
 
 /* ---- Partners ---- */
 .partners{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.partner-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-.partner{border-right:1px solid var(--line);border-bottom:1px solid var(--line);aspect-ratio:16/7;display:grid;place-items:center;transition:background .3s;padding:16px}
+.partner-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.partner{border-right:1px solid var(--line);border-bottom:1px solid var(--line);height:190px;display:grid;place-items:center;transition:background .3s;padding:18px;overflow:hidden;min-height:0}
 .partner:hover{background:var(--surface)}
-.partner .chip{width:100%;height:100%;background:var(--plate);border-radius:8px;display:grid;place-items:center;padding:14px 20px;transition:transform .3s ease,box-shadow .3s ease}
+.partner .chip{width:100%;height:100%;background:var(--plate);border-radius:8px;display:grid;place-items:center;padding:16px 22px;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease}
 .partner:hover .chip{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.35)}
 .partner .chip img{max-width:100%;max-height:100%;object-fit:contain}
 .partner .pn{font-family:"Space Grotesk";font-weight:700;font-size:16px;letter-spacing:.04em;color:var(--muted);text-align:center;transition:color .3s;padding:0 12px}
@@ -463,8 +463,6 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
       <div class="partner"><div class="chip"><img src="assets/partners/fifarivals.png" alt="FIFA Rivals"></div></div>
       <div class="partner"><div class="chip"><img src="assets/partners/mydoge.png" alt="MyDoge"></div></div>
       <div class="partner"><div class="chip"><img src="assets/partners/playsout.png" alt="Playsout"></div></div>
-      <div class="partner"><div class="pn">Partner<small>Slot — available</small></div></div>
-      <div class="partner"><div class="pn amber" style="color:var(--amber)">Become a Partner<small style="color:var(--muted)">Enquire →</small></div></div>
     </div>
   </div>
 </section>
@@ -574,12 +572,9 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
       <div>
         <div class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:16px">Connect</div>
         <div class="socials">
-          <a href="#" target="_blank" rel="noopener">X / Twitter</a>
-          <a href="#" target="_blank" rel="noopener">Instagram</a>
-          <a href="#" target="_blank" rel="noopener">TikTok</a>
-          <a href="#" target="_blank" rel="noopener">YouTube</a>
-          <a href="#" target="_blank" rel="noopener">Discord</a>
-          <a href="#" target="_blank" rel="noopener">Twitch</a>
+          <a href="https://x.com/SMPR_esports" target="_blank" rel="noopener">X / Twitter</a>
+          <a href="https://www.instagram.com/smpr.esports/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://discord.gg/m5eX9xdEB" target="_blank" rel="noopener">Discord</a>
         </div>
       </div>
     </div>
@@ -761,11 +756,26 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
   prevBtn.addEventListener('click', function(){ if(curStep>1){ curStep--; showStep(curStep);} });
 
   function submitApply(){
+    var payload = {
+      archetype: chosenType,
+      handle: document.getElementById('ign').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      region: document.getElementById('region').value,
+      proof: document.getElementById('link').value.trim(),
+      why: document.getElementById('why').value.trim()
+    };
+    var localRef = 'SMPR-APP-' + String(Math.floor(100000+Math.random()*899999));
     document.getElementById('applyForm').style.display='none';
     var done = document.getElementById('applyDone');
-    var ref = 'SMPR-APP-' + String(Math.floor(100000+Math.random()*899999));
-    document.getElementById('refNo').textContent = ref;
+    document.getElementById('refNo').textContent = localRef;
     done.classList.add('show');
+    // deliver the application (emails the collective + logs to the sheet)
+    fetch('/api/apply', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(d && d.ok && d.ref){ document.getElementById('refNo').textContent = d.ref; } })
+      .catch(function(){});
   }
 
   /* ---- Portal modal ---- */
