@@ -1,2 +1,12 @@
 .DS_Store
 assets/merch/WhatsApp*
+assets/merch/Screenshot*
+
+# partner logo source files — only the processed PNGs ship
+assets/partners/*
+!assets/partners/topps.png
+!assets/partners/vitacoco.png
+!assets/partners/minecraft.png
+!assets/partners/fifarivals.png
+!assets/partners/mydoge.png
+!assets/partners/playsout.png
