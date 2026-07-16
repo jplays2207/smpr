@@ -262,6 +262,22 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
 .mc-id{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted);margin-top:10px;display:flex;justify-content:space-between}
 .mc-foot{padding:18px 24px;border-top:1px solid var(--line);background:#000}
 .mc-foot .btn{width:100%;justify-content:center}
+/* ---- Live member data (SMPR backend) ---- */
+.modal-box.wide{max-width:860px}
+.mc-live{display:grid;grid-template-columns:320px 1fr;gap:28px;padding:26px 24px;background:linear-gradient(160deg,var(--surface-2),var(--surface));align-items:start}
+.mc-cardwrap{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#000;min-height:210px;display:grid;place-items:center}
+.mc-cardwrap img{width:100%;height:auto;display:none}
+.mc-cardskel{display:grid;place-items:center;min-height:210px;padding:20px;text-align:center;color:var(--muted-2);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.mc-side{min-width:0}
+.mc-title{display:none;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#000;background:var(--amber);padding:5px 10px;margin-bottom:14px;font-weight:700}
+.mc-coins{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border:1px solid var(--line);background:var(--bg);padding:12px 14px;margin-bottom:18px}
+.mc-coins .ck{font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2)}
+.mc-coins .cv{font-family:"Anton",sans-serif;font-size:26px;color:var(--amber);line-height:1}
+.mc-badgewrap{display:none;padding:0 24px 22px;background:var(--surface)}
+.mc-badgehead{display:flex;justify-content:space-between;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);margin-bottom:11px;border-top:1px solid var(--line);padding-top:16px}
+.mc-badges{display:flex;flex-wrap:wrap;gap:7px}
+.mc-badges .badge{border:1px solid var(--line-strong);color:var(--muted);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;padding:6px 9px;border-radius:3px}
+@media(max-width:720px){.mc-live{grid-template-columns:1fr;gap:20px}}
 
 /* ---- Reveal ---- */
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
@@ -615,17 +631,27 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
         <span class="brand"><span class="mark"><img src="logo.png" alt=""></span>SMPR</span>
         <span class="status"><span class="pulse"></span><span id="mcStatus">APPROVED</span></span>
       </div>
-      <div class="mc-body">
-        <div class="mc-no">MEMBER No. <b id="mcNo">063</b> / 100</div>
-        <div class="mc-handle" id="mcHandle">NIGHTSHADE</div>
-        <div class="mc-rows">
-          <div class="r"><div class="k">Archetype</div><div class="v" id="mcType">PvP Demon</div></div>
-          <div class="r"><div class="k">Region</div><div class="v" id="mcRegion">Worldwide</div></div>
-          <div class="r"><div class="k">Clearance</div><div class="v amber">Full Portal</div></div>
-          <div class="r"><div class="k">Issued</div><div class="v" id="mcIssued">—</div></div>
+      <div class="mc-live">
+        <div class="mc-cardwrap">
+          <img id="mcCardImg" alt="SMPR member card">
+          <div class="mc-cardskel" id="mcCardSkel">Loading card…</div>
         </div>
-        <div class="mc-barcode"></div>
-        <div class="mc-id"><span id="mcId">ID · —</span><span>SMPR // COLLECTIVE</span></div>
+        <div class="mc-side">
+          <div class="mc-no">MEMBER No. <b id="mcNo">—</b> / 100</div>
+          <div class="mc-handle" id="mcHandle">—</div>
+          <div class="mc-title" id="mcTitle"></div>
+          <div class="mc-coins"><span class="ck">SMPR Coins</span><span class="cv" id="mcCoins">—</span></div>
+          <div class="mc-rows">
+            <div class="r"><div class="k">Archetype</div><div class="v" id="mcType">—</div></div>
+            <div class="r"><div class="k">Region</div><div class="v" id="mcRegion">—</div></div>
+            <div class="r"><div class="k">Member since</div><div class="v" id="mcSince">—</div></div>
+            <div class="r"><div class="k">Clearance</div><div class="v amber">Full Portal</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mc-badgewrap" id="mcBadgeWrap">
+        <div class="mc-badgehead"><span>Badges</span><span id="mcBadgeCount">0</span></div>
+        <div class="mc-badges" id="mcBadges"></div>
       </div>
       <div class="mc-foot">
         <button class="btn btn-solid" id="enterWorld">Enter The World <span class="dot"></span></button>
@@ -785,6 +811,7 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
   var openModal = function(){
     modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
     login.style.display='block'; card.classList.remove('show');
+    if(modalBox){ modalBox.classList.remove('wide'); }
     document.getElementById('portalErr').textContent='';
     document.body.style.overflow='hidden';
     mnav.classList.remove('open');
@@ -800,6 +827,65 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
 
   var portalErr = document.getElementById('portalErr');
   var portalSubmit = document.getElementById('portalSubmit');
+  var modalBox = modal.querySelector('.modal-box');
+
+  /* ---- Live member data (SMPR backend) ---- */
+  var SMPR_API = 'https://smpr-sand.vercel.app';
+  function prettyBadge(s){
+    return String(s).replace(/_/g,' ').replace(/\b\w/g, function(m){ return m.toUpperCase(); });
+  }
+  function renderBadges(list){
+    var wrap = document.getElementById('mcBadgeWrap');
+    var grid = document.getElementById('mcBadges');
+    var cnt  = document.getElementById('mcBadgeCount');
+    grid.innerHTML = '';
+    var clean = (list||[]).filter(function(b){ return b && String(b).trim() && String(b).trim() !== '...'; });
+    if(!clean.length){ wrap.style.display='none'; return; }
+    wrap.style.display='block';
+    cnt.textContent = clean.length;
+    clean.forEach(function(b){
+      var s = document.createElement('span');
+      s.className = 'badge'; s.textContent = prettyBadge(b);
+      grid.appendChild(s);
+    });
+  }
+  function loadLiveMember(n){
+    var img  = document.getElementById('mcCardImg');
+    var skel = document.getElementById('mcCardSkel');
+    renderBadges([]);
+    document.getElementById('mcCoins').textContent = '—';
+    document.getElementById('mcTitle').style.display = 'none';
+    if(!n && n !== 0){ skel.textContent = 'Card unavailable'; return; }
+    // 1) rendered card image (server-generated, already themed)
+    img.style.display='none'; skel.style.display='grid'; skel.textContent='Loading card…';
+    img.onload  = function(){ skel.style.display='none'; img.style.display='block'; };
+    img.onerror = function(){ img.style.display='none'; skel.style.display='grid'; skel.textContent='Card not available yet'; };
+    img.src = SMPR_API + '/api/smpr/card_image/' + n + '?animated=1';
+    // 2) live stats — coins change constantly, so never cache
+    fetch(SMPR_API + '/api/smpr/card/' + n, { cache:'no-store' })
+      .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
+      .then(function(res){
+        if(!res || !res.ok) throw new Error('bad');
+        var m = res.member || {}, c = res.card || {};
+        if(c.name) document.getElementById('mcHandle').textContent = String(c.name).toUpperCase();
+        if(m.archetype) document.getElementById('mcType').textContent = m.archetype;
+        if(m.region) document.getElementById('mcRegion').textContent = m.region;
+        if(m.status) document.getElementById('mcStatus').textContent = String(m.status).toUpperCase();
+        document.getElementById('mcCoins').textContent =
+          (typeof c.coins === 'number') ? c.coins.toLocaleString() : '—';
+        var t = document.getElementById('mcTitle');
+        if(c.title){ t.textContent = c.title; t.style.display='inline-block'; }
+        if(c.joined_at){
+          var dt = new Date(c.joined_at);
+          if(!isNaN(dt.getTime())){
+            document.getElementById('mcSince').textContent =
+              dt.toLocaleDateString(undefined,{month:'short', year:'numeric'});
+          }
+        }
+        renderBadges(c.badges || []);
+      })
+      .catch(function(){ /* backend not reachable / number not there yet — sheet data stays */ });
+  }
   document.getElementById('portalForm').addEventListener('submit', function(e){
     e.preventDefault();
     var no = document.getElementById('memberNoInput').value.trim();
@@ -814,17 +900,18 @@ footer{border-top:1px solid var(--line);padding:80px 0 40px;position:relative;ov
       .then(function(d){
         if(!d || !d.ok){ portalErr.textContent='> Access denied. Check your number and code.'; return; }
         var handle = String(d.handle||'MEMBER').toUpperCase();
-        var mno = String(d.memberNo||no).replace(/[^0-9]/g,'').padStart(3,'0');
+        var rawNo = String(d.memberNo||no).replace(/[^0-9]/g,'');
+        var mno = rawNo.padStart(3,'0');
+        // fill from the members sheet first (instant), live data overlays it below
         document.getElementById('mcHandle').textContent = handle;
         document.getElementById('mcNo').textContent = mno;
         document.getElementById('mcType').textContent = d.archetype || '—';
-        document.getElementById('mcRegion').textContent = d.region || 'Worldwide';
+        document.getElementById('mcRegion').textContent = d.region || '—';
+        document.getElementById('mcSince').textContent = d.issued || '—';
         var st = document.getElementById('mcStatus'); if(st){ st.textContent = String(d.status||'APPROVED').toUpperCase(); }
-        document.getElementById('mcIssued').textContent = d.issued || '—';
-        var s = handle + mno, seed = 0;
-        for(var i=0;i<s.length;i++){ seed = (seed*31 + s.charCodeAt(i))>>>0; }
-        document.getElementById('mcId').textContent = 'ID · '+ seed.toString(16).toUpperCase().slice(0,10).padStart(8,'0');
         login.style.display='none'; card.classList.add('show');
+        modalBox.classList.add('wide');
+        loadLiveMember(parseInt(rawNo,10));
       })
       .catch(function(){ portalErr.textContent='> Connection error. Please try again.'; })
       .then(function(){ portalSubmit.disabled = false; portalSubmit.innerHTML = origBtn; });
